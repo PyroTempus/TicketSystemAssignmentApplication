@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+<title>Your Tickets</title>
+
+{% endblock %}
+
+
+{% block body %}
+
+<!-- If there are no tickets, lets display a message telling the user there aren't any tickets available
+     instead of displaying an empty table to them.-->
+
+{% if tickets|length == 0 %}
+    <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-dark" style="color:white">
+        <div class="col-md-5 p-lg-5 mx-auto my-5">
+            <h1 class="display-4 font-weight-normal">No Tickets</h1>
+
+
+            <p class="lead font-weight-normal">You don't seem to have any tickets open currently. Try making one below.</p>
+            <a class="btn btn-primary" href="/create">Create Ticket</a>
+        </div>
+        <div class="product-device box-shadow d-none d-md-block"></div>
+        <div class="product-device product-device-2 box-shadow d-none d-md-block"></div>
+    </div>
+{% else %}
+    <table class="table table-hover table-dark">
+        <thead>
+        <tr>
+            <!-- Column Names -->
+            <th scope="col">ID</th>
+            <th scope="col">Name</th>
+            <th scope="col">Description</th>
+            <th scope="col">Status</th>
+            {% if current_user.is_admin %}
+            <th scope="col">Creator</th>
+            {% endif %}
+            <th scope="col">Date Opened</th>
+            <th scope="col">Options</th>
+        </tr>
+        </thead>
+        <tbody>
+            <!-- Displays the users current tickets: -->
+            {% for ticket in tickets %}
+                <tr>
+                    {% if (ticket.owner == current_user.id) or (current_user.is_admin) %}
+                        <td>{{ ticket.id }}</td>
+                        <td>{{ ticket.name }}</td>
+                        <td>{{ ticket.description }}</td>
+                        <td>{{ ticket.status }}</td>
+
+                        <!-- Checks if the user is admin, and if they are, we add the extra 'user' column -->
+                        {% if (current_user.is_admin) %}
+                            <td>{{ ticket.owned_user.username }}</td>
+                        {% endif %}
+
+                        <!-- Adds in the two necessary buttons for CRUD operations. Updating and Deleting. -->
+                        <td>{{ ticket.date_created }}</td>
+                        <td>
+                            <a href="/update/{{ticket.id}}" class="btn btn-outline btn-success">Update Ticket</a>
+                            <a href="/delete/{{ticket.id}}" class="btn btn-outline btn-success">Close Ticket</a>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+{% endblock %}
